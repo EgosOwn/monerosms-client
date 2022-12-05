@@ -2,16 +2,17 @@ import os
 import sys
 from base64 import urlsafe_b64encode
 
-VERSION = '0.2.0'
+VERSION = '1.0.0'
 
-base_url = "https://api.sms.voidnet.tech/"
+base_url = "https://api.monerosms.com/"
 proxies = {}
 if os.getenv("MONERO_SMS_TOR", None):
-    base_url = "http://qgwz46kabdhwv6l7zhfihhe7h5ep2nbo4mvhw74lcnsxk2mkhh5lpyqd.onion/"
-    proxies = {
-        'http': f'socks4a://127.0.0.1:{os.getenv("MONERO_SMS_TOR")}',
-        'https': f'socks4a://127.0.0.1:{os.getenv("MONERO_SMS_TOR")}'
-    }
+    base_url = "http://api.xmr4smsoncunkfgfjr6xmxl57afsmuu6rg2bwuysbgg4wdtoawamwxad.onion/"
+    if not os.getenv("MONERO_SMS_TRANSPARENT_TOR", None):
+        proxies = {
+            'http': f'socks4a://127.0.0.1:{os.getenv("MONERO_SMS_TOR")}',
+            'https': f'socks4a://127.0.0.1:{os.getenv("MONERO_SMS_TOR")}'
+        }
 
 user = os.getenv('MONERO_SMS_TOKEN')
 

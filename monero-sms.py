@@ -59,7 +59,7 @@ def menu():
                     print("You are not permitted to use the service unless you agree.")
                     return None
             with open(auth_file, 'wb') as f:
-                f.write(urlsafe_b64encode(os.urandom(16)).removesuffix(b'=='))
+                f.write(urlsafe_b64encode(os.urandom(32)).replace('=', ''))
             print(f'Account number generated {auth_file}')
             print('Back it up to keep access to your account')
             return None
