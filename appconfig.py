@@ -2,7 +2,7 @@ import os
 import sys
 from base64 import urlsafe_b64encode
 
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 
 base_url = "https://api.monerosms.com/"
 proxies = {}
