@@ -6,7 +6,8 @@ from appconfig import base_url, user, proxies
 
 def send_message(num):
     if not num:
-        num = int(input("Enter number to text, EOF to finish: "))
+        num = int(input("Enter number to text: "))
+    print("Enter the message to send, then EOF (Ctrl+D) to send")
     body = ''
     try:
         for i in sys.stdin:
