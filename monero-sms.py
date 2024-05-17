@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import sys
+import secrets
 import os
+import json
+import datetime
 from time import sleep
-from base64 import urlsafe_b64encode
-
 import traceback
 
 import requests
@@ -53,13 +54,13 @@ def menu():
                 return None
             if not os.getenv("MONEROSMS_I_AGREE_TO_TOS", False):
                 print(f"By using the service you agree to the terms of service, at {base_url}tos")
-                print("PLEASE READ IT, IT IS NOT LONG")
-                agree = input("Do you agree? y/n ").lower()
+                print("The terms of service is human readable")
+                agree = input("Have you read the terms of service and do you agree to them? y/n ").lower()
                 if agree not in ['y', 'yes']:
                     print("You are not permitted to use the service unless you agree.")
                     return None
-            with open(auth_file, 'wb') as f:
-                f.write(urlsafe_b64encode(os.urandom(32)).replace(b'=', b''))
+            with open(auth_file, 'w') as f:
+                f.write(secrets.token_hex(25))
             print(f'Account number generated {auth_file}')
             print('Back it up to keep access to your account')
             return None
@@ -116,7 +117,7 @@ def menu():
         case "watch":
             watch_thread(int(sys.argv[2]))
             return None
-        case "get":
+        case "get" | "thread":
             try:
                 thread_num = sys.argv[2]
             except IndexError:
@@ -129,8 +130,25 @@ def menu():
                 pass
             req = requests.get(
                 f"{base_url}{user}/thread/{thread_num}/{offset}", proxies=proxies)
+            if req.status_code != 200:
+                sys.stderr.write(f"Error {req.status_code} \n{req.text}")
+                sys.exit(1)
+            for message in req.json():
+                if message['Incoming']:
+                    # EpochMili to human readable
+                    print(datetime.datetime.fromtimestamp(
+                            message['EpochMili'] / 1000).strftime(
+                                '%Y-%m-%d %H:%M:%S'),
+                          f"From {thread_num}:\n{message['Body']}")
+                else:
+                    print(datetime.datetime.fromtimestamp(
+                            message['EpochMili'] / 1000).strftime(
+                                '%Y-%m-%d %H:%M:%S'),
+                          f"To {thread_num}:\n{message['Body']}")
+            sys.exit(0)
+
         case "":
-            print(f"Monero SMS Client v{VERSION}")
+            print(f"MoneroSMS Client v{VERSION}")
             sys.exit(0)
         case _:
             print("No such command")
